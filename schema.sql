@@ -14,6 +14,7 @@ create table if not exists public.registrations (
   team_name text,
   team_members text,
   problem_statement text,
+  payment_screenshot text,
   constraint ctf_rules check (
     event <> 'ctf' or (
       participant_type = 'student' and

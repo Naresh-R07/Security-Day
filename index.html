@@ -40,11 +40,36 @@ section{padding:36px 0}
 .bar b{display:block;font-family:var(--head);font-size:16px}.bar span{font-size:13px;color:var(--steel)}
 .bar:hover{background:var(--sig);color:#10213b}.bar:hover span{color:#10213b}
 .bar.flag{border-color:var(--flag)}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}
-.ev{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:22px}
+.ev{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column}
 .ev h3{font:800 18px/1.2 var(--head);margin:0 0 4px}
 .ev p{margin:6px 0;font-size:14px;color:var(--steel)}
 .ev .who{color:var(--ink);font-weight:500}
+.ev-qr-wrap{margin-top:auto;padding-top:14px;border-top:1px dashed var(--line);text-align:center}
+.ev-qr{width:140px;height:140px;object-fit:contain;border:1px solid var(--line);border-radius:6px;background:#fff;padding:4px;cursor:pointer;transition:transform .15s ease}
+.ev-qr:hover{transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.ev-qr-note{font-size:12px;color:var(--steel);margin:6px 0 0}
+/* contact card */
+.contact-sec{padding:36px 0 16px}
+.contact-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:24px}
+.contact-card h2{font:800 24px/1.1 var(--head);margin:0 0 6px}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:16px}
+.contact-box{border:1px solid var(--line);border-radius:6px;padding:14px;background:var(--paper)}
+.contact-box b{display:block;font-size:16px;margin-bottom:6px}
+.contact-links{display:flex;gap:10px;flex-wrap:wrap}
+.c-link{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:4px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:500;text-decoration:none}
+.c-link:hover{background:var(--sig);color:#10213b;border-color:var(--sig)}
+.c-link.wa:hover{background:#25d366;color:#fff;border-color:#25d366}
+/* screenshot upload & preview */
+.upload-box{border:2px dashed var(--line);border-radius:6px;padding:14px;background:var(--paper);text-align:center;transition:border-color .15s}
+.upload-box:hover{border-color:var(--sig)}
+.preview-area{display:flex;align-items:center;gap:14px;margin-top:10px;padding:10px;border-radius:6px;background:var(--card);border:1px solid var(--line);text-align:left}
+.preview-area img{width:64px;height:64px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+.preview-info{font-size:13px;color:var(--steel)}
+.preview-info b{display:block;color:var(--ink)}
+/* modal lightbox */
+.qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:99;padding:20px;cursor:pointer}
+.qr-modal img{max-width:90vw;max-height:80vh;border-radius:8px;background:#fff;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 /* form */
 form{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:24px;margin-top:18px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -128,6 +153,20 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--steel);font-s
             <p class="hint">Register the whole team once, through the team lead (member 1 is you). Teammates do not need to register separately.</p></div>
         </div>
       </div>
+      <div class="full" id="paymentWrap">
+        <label for="payment_screenshot">Payment screenshot <span style="color:var(--flag)">*</span></label>
+        <div class="upload-box">
+          <input id="payment_screenshot" name="payment_screenshot" type="file" accept="image/*" required style="display:block;margin:0 auto">
+          <p class="hint">Upload payment confirmation screenshot. Max 1 MB. It will be compressed before submitting.</p>
+        </div>
+        <div id="previewWrap" class="preview-area hidden">
+          <img id="imgPreview" alt="Payment preview">
+          <div class="preview-info">
+            <b id="previewName">Screenshot loaded</b>
+            <span id="compressionRatio">Compressed</span>
+          </div>
+        </div>
+      </div>
     </div>
     <p class="err" id="err" role="alert"></p>
     <button class="btn" id="submit" type="submit">Complete registration</button>
@@ -139,7 +178,34 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--steel);font-s
     <p>Reference: <b id="ref"></b>. Screenshot this page or note the reference to show at the desk.</p>
   </div>
 </div></section>
+
+<section id="contact" class="contact-sec"><div class="wrap">
+  <div class="contact-card">
+    <h2>Reach Out</h2>
+    <p class="hint" style="margin:0 0 16px">Need help with registration or event queries? Contact our event coordinators:</p>
+    <div class="contact-grid">
+      <div class="contact-box">
+        <b>N Adarsh</b>
+        <div class="contact-links">
+          <a href="tel:6381984881" class="c-link">📞 Call: 6381984881</a>
+          <a href="https://wa.me/916381984881" target="_blank" rel="noopener" class="c-link wa">💬 WhatsApp</a>
+        </div>
+      </div>
+      <div class="contact-box">
+        <b>Yaswant</b>
+        <div class="contact-links">
+          <a href="tel:8903071754" class="c-link">📞 Call: 8903071754</a>
+          <a href="https://wa.me/918903071754" target="_blank" rel="noopener" class="c-link wa">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
 </main>
+
+<div id="qrModal" class="qr-modal hidden" onclick="this.classList.add('hidden')">
+  <img id="modalQrImg" src="" alt="Enlarged QR Code">
+</div>
 
 <footer><div class="wrap">National Computer Security Day 2026, Chennai Institute of Technology. Questions? Contact the organizing team of the Tech Club.</div></footer>
 
@@ -174,13 +240,16 @@ window.CONFIG = {
   EVENTS: [
     { id: "hackathon", name: "Cyber Hackathon / Buildathon", time: "9:00 am - 2:00 pm", from: 9, to: 14,
       desc: "Pick one of 3 problem statements and build a platform or tool. Citans team up with staff and students.",
-      audience: "Open to all Citans. Team of 3 to 4 (students and staff can team up)", team: { min: 3, max: 4 } },
+      audience: "Open to all Citans. Team of 3 to 4 (students and staff can team up)", team: { min: 3, max: 4 },
+      qr: "CTF & HACK.jpeg" },
     { id: "ctf", name: "Capture the Flag", time: "9:00 am - 2:00 pm", from: 9, to: 14,
       desc: "A virtual cybersecurity experience across 5 domains.",
-      audience: "All CIT students. Team of exactly 2", team: { min: 2, max: 2 } },
+      audience: "All CIT students. Team of exactly 2", team: { min: 2, max: 2 },
+      qr: "CTF & HACK.jpeg" },
     { id: "workshop", name: "Cybersecurity Workshop", time: "10:00 am - 2:00 pm", from: 10, to: 14,
       desc: "What cybersecurity is, the threats to watch for, and a look at the recent attacks from this October.",
-      audience: "Open to students of all departments and staff. Individual registration", team: { min: 1, max: 1 } }
+      audience: "Open to students of all departments and staff. Individual registration", team: { min: 1, max: 1 },
+      qr: "WORKSHOP.jpeg" }
   ]
 };
 </script>
@@ -202,7 +271,21 @@ const hours = ['9 am','10 am','11 am','12 noon','1 pm'];
 $('tl').innerHTML = hours.map((h,i)=>`<div class="hr" style="grid-column:${i+1};grid-row:1">${h}</div>`).join('') +
   C.EVENTS.map((ev,i)=>`<button type="button" class="bar ${ev.id==='ctf'?'flag':''}" data-ev="${ev.id}"
     style="grid-column:${ev.from-8}/${ev.to-8};grid-row:${i+2}"><b>${esc(ev.name)}</b><span>${esc(ev.time)}</span></button>`).join('');
-$('cards').innerHTML = C.EVENTS.map(ev=>`<article class="ev"><h3>${esc(ev.name)}</h3><p>${esc(ev.time)}</p><p>${esc(ev.desc)}</p><p class="who">${esc(ev.audience)}</p></article>`).join('');
+$('cards').innerHTML = C.EVENTS.map(ev=>`<article class="ev">
+  <h3>${esc(ev.name)}</h3>
+  <p>${esc(ev.time)}</p>
+  <p>${esc(ev.desc)}</p>
+  <p class="who">${esc(ev.audience)}</p>
+  <div class="ev-qr-wrap">
+    <img src="${esc(ev.qr)}" alt="${esc(ev.name)} Payment QR" class="ev-qr" onclick="showQr('${esc(ev.qr)}')">
+    <p class="ev-qr-note">Scan QR to pay • Click to zoom</p>
+  </div>
+</article>`).join('');
+
+window.showQr = function(src){
+  $('modalQrImg').src = src;
+  $('qrModal').classList.remove('hidden');
+};
 
 // form setup
 $('department').innerHTML += C.DEPARTMENTS.map(d=>`<option>${esc(d.name)}</option>`).join('');
@@ -246,6 +329,70 @@ function renderTeam(){
   $('members').innerHTML = html;
   document.querySelectorAll('#members .mem').forEach((el,k)=>{ el.value = old[k+1]||''; });
 }
+let compressedScreenshot = null;
+
+// Compress image via HTML5 Canvas
+async function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (file.size > 1024 * 1024) {
+      return reject(new Error('Image must be under 1 MB.'));
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 800;
+        let w = img.width, h = img.height;
+        if (w > h && w > maxDim) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else if (h > maxDim) {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w; cvs.height = h;
+        const ctx = cvs.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // Compress to high-efficiency JPEG dataURL at quality 0.55
+        const dataUrl = cvs.toDataURL('image/jpeg', 0.55);
+        resolve({
+          dataUrl,
+          origKb: Math.round(file.size / 1024),
+          compKb: Math.round((dataUrl.length * 3 / 4) / 1024)
+        });
+      };
+      img.onerror = () => reject(new Error('Failed to load image file.'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('Failed to read image file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+$('payment_screenshot').addEventListener('change', async e => {
+  $('err').textContent = '';
+  const file = e.target.files[0];
+  if (!file) {
+    compressedScreenshot = null;
+    $('previewWrap').classList.add('hidden');
+    return;
+  }
+  try {
+    const res = await compressImage(file);
+    compressedScreenshot = res.dataUrl;
+    $('imgPreview').src = res.dataUrl;
+    $('previewName').textContent = file.name;
+    $('compressionRatio').textContent = `Original: ${res.origKb} KB → Compressed: ${res.compKb} KB`;
+    $('previewWrap').classList.remove('hidden');
+  } catch (err) {
+    compressedScreenshot = null;
+    $('previewWrap').classList.add('hidden');
+    e.target.value = '';
+    $('err').textContent = err.message || 'Error processing image.';
+  }
+});
+
 $('phone').addEventListener('input', e => {
   e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
 });
@@ -297,13 +444,16 @@ $('form').addEventListener('submit', async e=>{
   const ok = eligible(ev, f.participant_type, dept);
   if (ok!==true) return fail(ok);
 
+  if (!compressedScreenshot) return fail('Please upload your payment confirmation screenshot.');
+
   const id = crypto.randomUUID();
   const row = { id, full_name: fullName, email, phone,
     participant_type: f.participant_type, reg_no: regNo, department: dept,
     year: student ? +f.year : null, event: ev, team_size: size,
     team_name: teamName,
     team_members: isTeam ? teamMembers.join('\n') : null,
-    problem_statement: ev === 'hackathon' ? f.problem_statement : null };
+    problem_statement: ev === 'hackathon' ? f.problem_statement : null,
+    payment_screenshot: compressedScreenshot };
 
   $('submit').disabled = true; $('submit').textContent = 'Registering...';
   const { data, error } = await sb.from('registrations').insert(row);
