@@ -43,11 +43,12 @@ create table if not exists public.registrations (
   )
 );
 
--- Prevent duplicate registrations across Email, Phone Number, Student Register Number, and Team Name
+-- Prevent duplicate registrations across Email, Phone Number, Student Register Number, Team Name, and Payment Screenshot
 create unique index if not exists registrations_email_uq on public.registrations (lower(email));
 create unique index if not exists registrations_phone_uq on public.registrations (phone);
 create unique index if not exists registrations_reg_no_uq on public.registrations (upper(reg_no)) where reg_no is not null;
 create unique index if not exists registrations_team_name_uq on public.registrations (lower(team_name)) where team_name is not null;
+create unique index if not exists registrations_payment_screenshot_uq on public.registrations (md5(payment_screenshot)) where payment_screenshot is not null;
 
 alter table public.registrations enable row level security;
 

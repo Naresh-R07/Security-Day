@@ -261,6 +261,9 @@ $('form').addEventListener('submit', async e => {
       if (msg.includes('registrations_team_name_uq') || msg.includes('team_name')) {
         return fail('This team name is already taken. Please choose another team name.');
       }
+      if (msg.includes('registrations_payment_screenshot_uq') || msg.includes('payment_screenshot')) {
+        return fail('This payment screenshot has already been used. Please upload your own valid payment proof.');
+      }
       return fail('You are already registered. Each person can register once.');
     }
     return fail(`Registration failed: ${error.message || 'Check your connection and try again.'}`);
