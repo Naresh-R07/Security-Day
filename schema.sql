@@ -42,8 +42,11 @@ create table if not exists public.registrations (
   )
 );
 
--- One registration per email (the events overlap in time, so one event per person)
+-- Prevent duplicate registrations across Email, Phone Number, Student Register Number, and Team Name
 create unique index if not exists registrations_email_uq on public.registrations (lower(email));
+create unique index if not exists registrations_phone_uq on public.registrations (phone);
+create unique index if not exists registrations_reg_no_uq on public.registrations (upper(reg_no)) where reg_no is not null;
+create unique index if not exists registrations_team_name_uq on public.registrations (lower(team_name)) where team_name is not null;
 
 alter table public.registrations enable row level security;
 

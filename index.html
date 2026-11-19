@@ -310,8 +310,23 @@ $('form').addEventListener('submit', async e=>{
   $('submit').disabled = false; $('submit').textContent = 'Complete registration';
   if (error) {
     console.error('Supabase error details:', error);
-    return fail(error.code==='23505' ? 'This email is already registered. Each person can join one event.' :
-      `Registration failed: ${error.message || 'Check your connection and try again.'}`);
+    if (error.code === '23505') {
+      const msg = error.message || '';
+      if (msg.includes('registrations_email_uq') || msg.includes('email')) {
+        return fail('This email is already registered. Each person can join one event.');
+      }
+      if (msg.includes('registrations_phone_uq') || msg.includes('phone')) {
+        return fail('This phone number is already registered.');
+      }
+      if (msg.includes('registrations_reg_no_uq') || msg.includes('reg_no')) {
+        return fail('This register number is already registered.');
+      }
+      if (msg.includes('registrations_team_name_uq') || msg.includes('team_name')) {
+        return fail('This team name is already taken. Please choose another team name.');
+      }
+      return fail('You are already registered. Each person can register once.');
+    }
+    return fail(`Registration failed: ${error.message || 'Check your connection and try again.'}`);
   }
   const evt = C.EVENTS.find(x=>x.id===ev);
   $('doneMsg').textContent = `${row.full_name}, you are in for ${evt.name} on 30 November 2026, ${evt.time}.` + (row.team_name ? ` Team: ${row.team_name} (${row.team_size} members).` : '');
