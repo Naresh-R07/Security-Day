@@ -4,18 +4,42 @@ create table if not exists public.registrations (
   created_at timestamptz not null default now(),
   full_name text not null check (char_length(full_name) between 2 and 100),
   email text not null check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
-  phone text not null check (phone ~ '^[0-9+ -]{10,15}$'),
+  phone text not null check (phone ~ '^[0-9]{10}$'),
   participant_type text not null check (participant_type in ('student','staff')),
   reg_no text,
   department text not null,
   year int check (year between 1 and 4),
   event text not null check (event in ('hackathon','ctf','workshop')),
+  team_size int not null default 1,
   team_name text,
   team_members text,
   problem_statement text,
-  constraint ctf_students_only check (event <> 'ctf' or participant_type = 'student'),
-  constraint hackathon_needs_team check (event <> 'hackathon' or (team_name is not null and problem_statement is not null)),
-  constraint student_needs_details check (participant_type <> 'student' or (reg_no is not null and year is not null))
+  constraint ctf_rules check (
+    event <> 'ctf' or (
+      participant_type = 'student' and
+      team_size = 2 and
+      team_name is not null and
+      problem_statement is null
+    )
+  ),
+  constraint hackathon_rules check (
+    event <> 'hackathon' or (
+      team_size in (3, 4) and
+      team_name is not null and
+      problem_statement is not null
+    )
+  ),
+  constraint workshop_rules check (
+    event <> 'workshop' or (
+      team_size = 1 and
+      team_name is null and
+      team_members is null and
+      problem_statement is null
+    )
+  ),
+  constraint student_needs_details check (
+    participant_type <> 'student' or (reg_no is not null and year is not null)
+  )
 );
 
 -- One registration per email (the events overlap in time, so one event per person)

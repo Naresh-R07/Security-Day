@@ -108,7 +108,7 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--steel);font-s
     <div class="grid">
       <div><label for="full_name">Full name</label><input id="full_name" name="full_name" autocomplete="name" required maxlength="100"></div>
       <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
-      <div><label for="phone">Phone (WhatsApp preferred)</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="10-digit number"></div>
+      <div><label for="phone">Phone (WhatsApp preferred)</label><input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required maxlength="10" placeholder="10-digit mobile number"></div>
       <div><label for="participant_type">I am a</label>
         <select id="participant_type" name="participant_type" required>
           <option value="student">Student</option><option value="staff">Staff</option></select></div>
@@ -246,6 +246,9 @@ function renderTeam(){
   $('members').innerHTML = html;
   document.querySelectorAll('#members .mem').forEach((el,k)=>{ el.value = old[k+1]||''; });
 }
+$('phone').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+});
 $('team_size').addEventListener('change',renderTeam);
 $('full_name').addEventListener('input',()=>{ const m=$('m1'); if(m) m.value=$('full_name').value; });
 ['participant_type','department'].forEach(i=>$(i).addEventListener('change',refresh));
@@ -262,37 +265,54 @@ $('form').addEventListener('submit', async e=>{
   const f = Object.fromEntries(new FormData($('form')));
   const student = f.participant_type==='student', ev = f.event;
   const fail = m => { $('err').textContent = m; };
-  if (!f.full_name || f.full_name.trim().length<2) return fail('Enter your full name.');
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email||'')) return fail('Enter a valid email address.');
-  if (!/^[0-9+ -]{10,15}$/.test(f.phone||'')) return fail('Enter a phone number with 10 to 15 digits.');
-  if (student && !(f.reg_no||'').trim()) return fail('Enter your register number.');
-  if (!f.department) return fail('Choose your department.');
-  if (!ev) return fail('Choose the event you want to join.');
-  const cfg = C.EVENTS.find(x=>x.id===ev), size = teamSize(cfg), isTeam = size>1;
+  const cfg = C.EVENTS.find(x=>x.id===ev);
+  const size = cfg ? teamSize(cfg) : 1;
+  const isTeam = size > 1;
   const others = isTeam ? [...document.querySelectorAll('#members .mem')].map(i=>i.value.trim()) : [];
+
+  // Sanitization
+  const clean = s => typeof s === 'string' ? s.trim().replace(/\s+/g, ' ') : '';
+  const fullName = clean(f.full_name);
+  const email = (f.email || '').trim().toLowerCase();
+  const phone = (f.phone || '').replace(/\D/g, '');
+  const regNo = student ? (f.reg_no || '').trim().toUpperCase() : null;
+  const dept = clean(f.department);
+  const teamName = isTeam ? clean(f.team_name) : null;
+  const teamMembers = isTeam ? others.map(clean) : [];
+
+  if (!fullName || fullName.length < 2) return fail('Enter your full name.');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail('Enter a valid email address.');
+  if (!/^[0-9]{10}$/.test(phone)) return fail('Enter a valid 10-digit mobile number.');
+  if (student && !regNo) return fail('Enter your register number.');
+  if (!dept) return fail('Choose your department.');
+  if (!ev) return fail('Choose the event you want to join.');
+
   if (isTeam) {
-    if (!(f.team_name||'').trim()) return fail('Enter a team name.');
-    if (ev==='hackathon' && !f.problem_statement) return fail('Choose a problem statement.');
-    if (others.length!==size-1 || others.some(n=>n.length<2)) return fail(`Enter the full names of all ${size} team members.`);
-    const all = [f.full_name.trim(), ...others].map(n=>n.toLowerCase());
-    if (new Set(all).size!==all.length) return fail('Each team member name must be different.');
+    if (!teamName) return fail('Enter a team name.');
+    if (ev === 'hackathon' && !f.problem_statement) return fail('Choose a problem statement.');
+    if (teamMembers.length !== size - 1 || teamMembers.some(n => n.length < 2)) return fail(`Enter the full names of all ${size} team members.`);
+    const all = [fullName, ...teamMembers].map(n => n.toLowerCase());
+    if (new Set(all).size !== all.length) return fail('Each team member name must be different.');
   }
-  const ok = eligible(ev, f.participant_type, f.department);
+  const ok = eligible(ev, f.participant_type, dept);
   if (ok!==true) return fail(ok);
 
   const id = crypto.randomUUID();
-  const row = { id, full_name:f.full_name.trim(), email:f.email.trim().toLowerCase(), phone:f.phone.trim(),
-    participant_type:f.participant_type, reg_no: student ? f.reg_no.trim() : null, department:f.department,
-    year: student ? +f.year : null, event:ev, team_size:size,
-    team_name: isTeam ? f.team_name.trim() : null,
-    team_members: isTeam ? others.join('\n') : null,
-    problem_statement: ev==='hackathon' ? f.problem_statement : null };
+  const row = { id, full_name: fullName, email, phone,
+    participant_type: f.participant_type, reg_no: regNo, department: dept,
+    year: student ? +f.year : null, event: ev, team_size: size,
+    team_name: teamName,
+    team_members: isTeam ? teamMembers.join('\n') : null,
+    problem_statement: ev === 'hackathon' ? f.problem_statement : null };
 
   $('submit').disabled = true; $('submit').textContent = 'Registering...';
-  const { error } = await sb.from('registrations').insert(row);
+  const { data, error } = await sb.from('registrations').insert(row);
   $('submit').disabled = false; $('submit').textContent = 'Complete registration';
-  if (error) return fail(error.code==='23505' ? 'This email is already registered. Each person can join one event.' :
-    'Registration failed. Check your connection and try again.');
+  if (error) {
+    console.error('Supabase error details:', error);
+    return fail(error.code==='23505' ? 'This email is already registered. Each person can join one event.' :
+      `Registration failed: ${error.message || 'Check your connection and try again.'}`);
+  }
   const evt = C.EVENTS.find(x=>x.id===ev);
   $('doneMsg').textContent = `${row.full_name}, you are in for ${evt.name} on 30 November 2026, ${evt.time}.` + (row.team_name ? ` Team: ${row.team_name} (${row.team_size} members).` : '');
   $('ref').textContent = id.slice(0,8).toUpperCase();
@@ -337,7 +357,9 @@ $('form').addEventListener('submit', async e=>{
     nodes.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,2.5+n.p*3,0,7);ctx.fill();});
     // packets
     packets=packets.filter(k=>{
-      const a=nodes[k.a],b=nodes[k.b];k.t+=k.s*dt/16;
+      const a=nodes[k.a],b=nodes[k.b];
+      if(!a || !b) return false;
+      k.t+=k.s*dt/16;
       const x=a.x+(b.x-a.x)*k.t,y=a.y+(b.y-a.y)*k.t;
       if(k.threat&&k.t>.55){ // firewall catches it
         rings.push({x,y,r:4,a:1});say(msgs[Math.random()*msgs.length|0],false);return false;
