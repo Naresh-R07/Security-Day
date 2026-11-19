@@ -9,7 +9,7 @@ create table if not exists public.registrations (
   reg_no text,
   department text not null,
   year int check (year between 1 and 4),
-  event text not null check (event in ('hackathon','ctf','workshop-attacks','workshop-basics')),
+  event text not null check (event in ('hackathon','ctf','workshop')),
   team_name text,
   team_members text,
   problem_statement text,
