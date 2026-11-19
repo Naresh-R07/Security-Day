@@ -169,38 +169,67 @@ section { padding: 36px 0; }
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
 }
 .tl-in {
-  min-width: 640px;
+  min-width: 720px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   position: relative;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent calc(20% - 1px),
+    var(--line) calc(20% - 1px),
+    var(--line) 20%
+  );
 }
 .hr {
-  padding: 8px 10px;
+  padding: 10px 14px;
   font-size: 13px;
+  font-weight: 600;
   color: var(--steel);
   border-left: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  background: var(--paper);
 }
 .hr:first-child { border-left: 0; }
 .bar {
-  margin: 6px;
-  padding: 10px 12px;
-  border-radius: 6px;
+  margin: 8px 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
   text-align: left;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--ink);
   background: var(--card);
   color: var(--ink);
   font: inherit;
   cursor: pointer;
-  transition: all .15s ease;
+  transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .03);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
-.bar b { display: block; font-family: var(--head); font-size: 16px; }
-.bar span { font-size: 13px; color: var(--steel); }
-.bar:hover { background: var(--sig); color: #10213b; }
-.bar:hover span { color: #10213b; }
-.bar.flag { border-color: var(--flag); }
+.bar b { display: block; font-family: var(--head); font-size: 15px; font-weight: 700; }
+.bar span { font-size: 13px; color: var(--steel); margin-top: 2px; }
+.bar:hover {
+  background: var(--sig);
+  border-color: var(--sig);
+  border-left-color: var(--ink);
+  color: #10213b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(246, 194, 28, .25);
+}
+.bar:hover span { color: #10213b; font-weight: 500; }
+.bar.flag { border-left-color: var(--flag); }
+.bar.flag:hover {
+  background: var(--flag);
+  color: #fff;
+  border-color: var(--flag);
+  box-shadow: 0 4px 12px rgba(200, 57, 43, .25);
+}
+.bar.flag:hover span { color: #fff; }
 
 /* Event Cards */
 .cards {

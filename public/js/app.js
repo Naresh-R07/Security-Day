@@ -11,9 +11,15 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
     now >= t ? 'Happening today.' : d === 1 ? 'Tomorrow.' : d + ' days to go.';
 })();
 
-// Timeline: 5 hour columns, 9am-2pm
-const hours = ['9 am', '10 am', '11 am', '12 noon', '1 pm'];
-$('tl').innerHTML = hours.map((h, i) => `<div class="hr" style="grid-column:${i + 1};grid-row:1">${h}</div>`).join('') +
+// Timeline: 9 am to 2 pm (starts at 9 am, finishes at 2 pm)
+const timeSlots = [
+  '9:00 am - 10:00 am',
+  '10:00 am - 11:00 am',
+  '11:00 am - 12:00 pm',
+  '12:00 pm - 1:00 pm',
+  '1:00 pm - 2:00 pm'
+];
+$('tl').innerHTML = timeSlots.map((h, i) => `<div class="hr" style="grid-column:${i + 1};grid-row:1">${h}</div>`).join('') +
   C.EVENTS.map((ev, i) => `<button type="button" class="bar ${ev.id === 'ctf' ? 'flag' : ''}" data-ev="${ev.id}"
     style="grid-column:${ev.from - 8}/${ev.to - 8};grid-row:${i + 2}"><b>${esc(ev.name)}</b><span>${esc(ev.time)}</span></button>`).join('');
 
